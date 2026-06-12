@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopVN – Cổng Thanh Toán VNPAY</title>
+  <meta name="description" content="Thanh toán nhanh chóng và bảo mật qua cổng thanh toán VNPAY Sandbox" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orbs"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav class="navbar">
+        <a href="/" class="logo">
+          <div class="logo-icon">🛒</div>
+          <span class="logo-text">ShopVN</span>
+        </a>
+        <span class="nav-badge">🔒 Sandbox Test</span>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main>
+    <div class="container">
+      <!-- Hero -->
+      <section class="hero">
+        <div class="hero-tag">
+          <span class="dot"></span>
+          Tích hợp VNPAY Sandbox
+        </div>
+        <h1>Thanh toán<br /><span class="gradient-text">An toàn & Nhanh chóng</span></h1>
+        <p class="hero-subtitle">Chọn sản phẩm bên dưới hoặc nhập số tiền tùy chỉnh rồi bấm thanh toán qua VNPAY.</p>
+      </section>
+
+      <!-- Product Selection -->
+      <p class="section-title" style="text-align:center;">— Chọn sản phẩm —</p>
+      <div class="products-grid">
+        <div class="product-card" data-price="199000" data-name="Cà phê Premium Blend" onclick="selectProduct(this)">
+          <span class="product-badge">Bán chạy</span>
+          <div class="check-icon">✓</div>
+          <span class="product-emoji">☕</span>
+          <div class="product-name">Cà phê Premium Blend</div>
+          <div class="product-desc">Hương vị đậm đà, thơm nồng từ hạt Arabica tuyển chọn của Đắk Lắk.</div>
+          <div class="product-price">199.000 ₫</div>
+        </div>
+
+        <div class="product-card" data-price="450000" data-name="Tai nghe Bluetooth Pro" onclick="selectProduct(this)">
+          <span class="product-badge">Mới</span>
+          <div class="check-icon">✓</div>
+          <span class="product-emoji">🎧</span>
+          <div class="product-name">Tai nghe Bluetooth Pro</div>
+          <div class="product-desc">Âm thanh Hi-Fi, chống ồn chủ động, thời lượng pin 30 giờ liên tục.</div>
+          <div class="product-price">450.000 ₫</div>
+        </div>
+
+        <div class="product-card" data-price="1200000" data-name="Smartwatch Series 5" onclick="selectProduct(this)">
+          <span class="product-badge">Cao cấp</span>
+          <div class="check-icon">✓</div>
+          <span class="product-emoji">⌚</span>
+          <div class="product-name">Smartwatch Series 5</div>
+          <div class="product-desc">Theo dõi sức khỏe 24/7, GPS tích hợp, chống nước IP68, màn hình AMOLED.</div>
+          <div class="product-price">1.200.000 ₫</div>
+        </div>
+      </div>
+
+      <!-- Payment Form -->
+      <div class="payment-section">
+        <div class="payment-card">
+          <div class="payment-card-header">
+            <div class="payment-card-header-icon">💳</div>
+            <div>
+              <h2>Thông tin thanh toán</h2>
+              <p>Điền thông tin đơn hàng và xác nhận</p>
+            </div>
+          </div>
+
+          <form id="paymentForm" onsubmit="handlePayment(event)">
+            <div class="form-group">
+              <label class="form-label" for="orderInfo">Mô tả đơn hàng</label>
+              <input
+                type="text"
+                id="orderInfo"
+                name="orderInfo"
+                class="form-input"
+                placeholder="Ví dụ: Thanh toan don hang #001"
+                value="Thanh toan don hang ShopVN"
+                maxlength="100"
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="amount">Số tiền (VND)</label>
+              <input
+                type="number"
+                id="amount"
+                name="amount"
+                class="form-input"
+                placeholder="Nhập số tiền tối thiểu 5,000"
+                min="5000"
+                max="100000000"
+                required
+              />
+              <div class="amount-preview" id="amountPreview"></div>
+            </div>
+
+            <div class="divider">hoặc chọn sản phẩm phía trên</div>
+
+            <button type="submit" class="btn-vnpay" id="payBtn">
+              <span class="btn-text">
+                Thanh toán qua
+                <span class="vnpay-logo">VNPAY</span>
+                →
+              </span>
+              <div class="spinner"></div>
+            </button>
+          </form>
+
+          <!-- Test Card Info -->
+          <div class="test-info">
+            <div class="test-info-title">
+              🧪 Thông tin thẻ test NCB (Sandbox)
+            </div>
+            <div class="test-info-grid">
+              <div class="test-info-item">
+                <span class="label">Số thẻ</span>
+                <span class="value">9704198526191432198</span>
+              </div>
+              <div class="test-info-item">
+                <span class="label">Tên chủ thẻ</span>
+                <span class="value">NGUYEN VAN A</span>
+              </div>
+              <div class="test-info-item">
+                <span class="label">Ngày phát hành</span>
+                <span class="value">07/15</span>
+              </div>
+              <div class="test-info-item">
+                <span class="label">OTP</span>
+                <span class="value">123456</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security Badges -->
+          <div class="security-badges">
+            <span class="security-badge">🔐 Mã hóa SSL</span>
+            <span class="security-badge">🛡️ HmacSHA512</span>
+            <span class="security-badge">✅ PCI DSS</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="height: 60px;"></div>
+    </div>
+  </main>
+
+  <script>
+    // ============================================
+    // Product Selection
+    // ============================================
+    function selectProduct(card) {
+      // Bỏ chọn tất cả card khác
+      document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+
+      // Chọn card này
+      card.classList.add('selected');
+
+      const price = parseInt(card.dataset.price);
+      const name = card.dataset.name;
+
+      // Điền vào form
+      document.getElementById('amount').value = price;
+      document.getElementById('orderInfo').value = `Thanh toan ${name}`;
+
+      // Update preview
+      updateAmountPreview(price);
+    }
+
+    // ============================================
+    // Amount Preview
+    // ============================================
+    function formatVND(amount) {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+      }).format(amount);
+    }
+
+    function updateAmountPreview(amount) {
+      const preview = document.getElementById('amountPreview');
+      if (amount && !isNaN(amount) && amount >= 5000) {
+        preview.textContent = `→ ${formatVND(amount)}`;
+      } else if (amount && amount < 5000) {
+        preview.textContent = '⚠️ Tối thiểu 5,000 VND';
+        preview.style.color = '#ef4444';
+        return;
+      } else {
+        preview.textContent = '';
+      }
+      preview.style.color = '';
+    }
+
+    document.getElementById('amount').addEventListener('input', function () {
+      updateAmountPreview(parseInt(this.value));
+      // Bỏ chọn product card nếu thay đổi tay
+      document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+    });
+
+    // ============================================
+    // Payment Handler
+    // ============================================
+    async function handlePayment(event) {
+      event.preventDefault();
+
+      const amount = parseInt(document.getElementById('amount').value);
+      const orderInfo = document.getElementById('orderInfo').value.trim();
+
+      if (!amount || amount < 5000) {
+        showError('Vui lòng nhập số tiền tối thiểu 5,000 VND');
+        return;
+      }
+
+      const btn = document.getElementById('payBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        const response = await fetch('/api/payment/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount, orderInfo }),
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.paymentUrl) {
+          // Redirect sang VNPAY
+          window.location.href = data.paymentUrl;
+        } else {
+          throw new Error(data.message || 'Tạo đường dẫn thanh toán thất bại');
+        }
+      } catch (error) {
+        console.error('Payment error:', error);
+        showError(error.message || 'Có lỗi xảy ra, vui lòng thử lại');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+
+    function showError(message) {
+      // Simple alert for now - could be enhanced with a modal
+      const existing = document.querySelector('.error-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.className = 'error-toast';
+      toast.style.cssText = `
+        position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+        background: rgba(239,68,68,0.9); color: white; padding: 12px 24px;
+        border-radius: 10px; font-size: 14px; font-weight: 500; z-index: 999;
+        backdrop-filter: blur(10px); animation: fadeInDown 0.3s ease;
+        box-shadow: 0 4px 20px rgba(239,68,68,0.4);
+      `;
+      toast.textContent = '⚠️ ' + message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+  </script>
+</body>
+</html>

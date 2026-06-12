@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kết quả thanh toán – ShopVN</title>
+  <meta name="description" content="Kết quả giao dịch thanh toán qua VNPAY" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orbs"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <nav class="navbar">
+        <a href="/" class="logo">
+          <div class="logo-icon">🛒</div>
+          <span class="logo-text">ShopVN</span>
+        </a>
+        <span class="nav-badge" id="navBadge">Kết quả giao dịch</span>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Result -->
+  <div class="result-wrapper">
+    <div class="container">
+      <div class="result-container">
+
+        <!-- Result Header -->
+        <div class="result-header" id="resultHeader">
+          <!-- Filled by JS -->
+        </div>
+
+        <!-- Transaction Detail Table -->
+        <div class="transaction-card" id="transactionCard" style="display:none;">
+          <div class="transaction-card-header">
+            <h3>📋 Chi tiết giao dịch</h3>
+            <span class="tx-status-badge" id="txStatusBadge"></span>
+          </div>
+          <table class="transaction-table" id="transactionTable">
+            <tbody>
+              <!-- Filled by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Actions -->
+        <div style="text-align:center; margin-top: 24px;" id="actionsArea">
+          <a href="/" class="btn-back">← Quay lại trang chủ</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // Parse URL params
+    // ============================================
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    const responseCode = params.get('responseCode') || '';
+
+    // ============================================
+    // Response code mapping
+    // ============================================
+    const responseCodes = {
+      '00': 'Giao dịch thành công',
+      '07': 'Trừ tiền thành công – Giao dịch bị nghi ngờ',
+      '09': 'Thẻ/Tài khoản chưa đăng ký Internet Banking',
+      '10': 'Xác thực thẻ/tài khoản sai quá 3 lần',
+      '11': 'Đã hết hạn chờ thanh toán',
+      '12': 'Thẻ/Tài khoản bị khóa',
+      '13': 'Sai mật khẩu OTP',
+      '24': 'Khách hàng hủy giao dịch',
+      '51': 'Tài khoản không đủ số dư',
+      '65': 'Vượt hạn mức giao dịch trong ngày',
+      '75': 'Ngân hàng thanh toán đang bảo trì',
+      '79': 'Sai mật khẩu thanh toán quá số lần quy định',
+      '99': 'Lỗi khác (không thuộc các loại trên)',
+    };
+
+    // ============================================
+    // Format helpers
+    // ============================================
+    function formatVND(amount) {
+      if (!amount && amount !== 0) return 'N/A';
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+      }).format(amount);
+    }
+
+    // ============================================
+    // Render Result Header
+    // ============================================
+    function renderHeader() {
+      const header = document.getElementById('resultHeader');
+      const isSuccess = status === 'success';
+
+      header.innerHTML = `
+        <div class="result-icon ${isSuccess ? 'success' : 'failed'}">
+          ${isSuccess ? '✓' : '✕'}
+        </div>
+        <h1 class="result-title ${isSuccess ? 'success' : 'failed'}">
+          ${isSuccess ? 'Thanh toán thành công!' : 'Giao dịch thất bại'}
+        </h1>
+        <p class="result-subtitle">
+          ${isSuccess
+            ? 'Đơn hàng của bạn đã được xác nhận. Cảm ơn bạn đã mua hàng!'
+            : (responseCodes[responseCode] || 'Giao dịch không thành công. Vui lòng thử lại.')
+          }
+        </p>
+      `;
+    }
+
+    // ============================================
+    // Render Transaction Table
+    // ============================================
+    function renderTable() {
+      const txnRef = params.get('txnRef');
+      const amount = params.get('amount');
+      const bankCode = params.get('bankCode');
+      const bankTranNo = params.get('bankTranNo');
+      const cardType = params.get('cardType');
+      const payDate = params.get('payDate');
+      const orderInfo = decodeURIComponent(params.get('orderInfo') || '');
+      const transactionNo = params.get('transactionNo');
+      const txStatus = params.get('transactionStatus');
+
+      // Only show table if we have transaction data
+      if (!txnRef && !transactionNo) return;
+
+      document.getElementById('transactionCard').style.display = 'block';
+
+      // Badge
+      const badge = document.getElementById('txStatusBadge');
+      const isSuccess = status === 'success';
+      badge.textContent = isSuccess ? '✓ Thành công' : '✕ Thất bại';
+      badge.className = `tx-status-badge ${isSuccess ? 'success' : 'failed'}`;
+
+      const rows = [
+        {
+          label: '🧾 Mã đơn hàng',
+          value: txnRef || 'N/A',
+          class: 'code-cell'
+        },
+        {
+          label: '💰 Số tiền',
+          value: amount ? formatVND(parseFloat(amount)) : 'N/A',
+          class: 'amount-cell'
+        },
+        {
+          label: '🏦 Ngân hàng',
+          value: bankCode || 'N/A',
+          class: ''
+        },
+        {
+          label: '💳 Loại thẻ',
+          value: cardType || 'N/A',
+          class: ''
+        },
+        {
+          label: '🔢 Mã giao dịch VNPAY',
+          value: transactionNo || 'N/A',
+          class: 'code-cell'
+        },
+        {
+          label: '🏧 Mã GD ngân hàng',
+          value: bankTranNo || 'N/A',
+          class: 'code-cell'
+        },
+        {
+          label: '🕐 Thời gian thanh toán',
+          value: payDate ? decodeURIComponent(payDate) : 'N/A',
+          class: ''
+        },
+        {
+          label: '📝 Nội dung',
+          value: orderInfo || 'N/A',
+          class: ''
+        },
+        {
+          label: '📊 Mã phản hồi',
+          value: responseCode ? `${responseCode} – ${responseCodes[responseCode] || 'Không xác định'}` : 'N/A',
+          class: ''
+        },
+      ];
+
+      const tbody = document.querySelector('#transactionTable tbody');
+      tbody.innerHTML = rows.map(row => `
+        <tr>
+          <td>${row.label}</td>
+          <td class="${row.class}">${row.value}</td>
+        </tr>
+      `).join('');
+    }
+
+    // ============================================
+    // Nav badge update
+    // ============================================
+    function updateNavBadge() {
+      const badge = document.getElementById('navBadge');
+      if (status === 'success') {
+        badge.style.background = 'rgba(16, 185, 129, 0.1)';
+        badge.style.color = '#10b981';
+        badge.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+        badge.textContent = '✓ Thanh toán thành công';
+      } else {
+        badge.style.background = 'rgba(239, 68, 68, 0.1)';
+        badge.style.color = '#ef4444';
+        badge.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+        badge.textContent = '✕ Giao dịch thất bại';
+      }
+    }
+
+    // ============================================
+    // Init
+    // ============================================
+    renderHeader();
+    renderTable();
+    updateNavBadge();
+  </script>
+</body>
+</html>
